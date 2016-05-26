@@ -1,0 +1,16 @@
+{
+    "version": "1.0.0",
+    "summary": "CreditCard validation",
+    "repository": "https://github.com/ersocon/elm-creditcard-validation",
+    "license": "MIT",
+    "source-directories": [
+        "src/"
+    ],
+    "exposed-modules": [
+        "Payment", "Payment.CreditCard.Validation"
+    ],
+    "dependencies": {
+        "elm-lang/core": "3.0.0 <= v < 4.0.0"
+    },
+    "elm-version": "0.17.0 <= v < 0.18.0"
+}
