@@ -1,7 +1,7 @@
 {
     "version": "1.0.0",
     "summary": "CreditCard validation",
-    "repository": "https://github.com/ersocon/elm-creditcard-validation",
+    "repository": "https://github.com/ersocon/creditcard-validation",
     "license": "MIT",
     "source-directories": [
         "src/"
