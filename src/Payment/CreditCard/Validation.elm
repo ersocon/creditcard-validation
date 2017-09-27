@@ -21,69 +21,79 @@ function with the signature of String -> Bool.
 -}
 
 import String exposing (toInt, toList, fromList)
+import Regex
 
 
 {-| Check the given credit card number for validity
 -}
 isValid : String -> Bool
-isValid creditCardNumber =
-    if String.length creditCardNumber > 0 && (sumDigits <| luhnSecondEach <| toListReverse creditCardNumber) % 10 == 0 then
-        True
+isValid input =
+    Just input
+        |> Maybe.andThen isNumber
+        |> Maybe.andThen checkLength
+        |> Maybe.andThen checkLuhn
+        |> Maybe.withDefault False
+
+
+isNumber : String -> Maybe String
+isNumber input =
+    let
+        regexRule =
+            Regex.regex "^[\\d]+$"
+    in
+        if
+            Regex.find Regex.All regexRule input
+                |> List.isEmpty
+        then
+            Nothing
+        else
+            Just input
+
+
+checkLength : String -> Maybe String
+checkLength input =
+    if input /= "" && String.length input <= 19 then
+        Just input
     else
-        False
+        Nothing
 
 
-luhnSecondEach : List Int -> List Int
-luhnSecondEach list =
-    case list of
-        [] ->
-            []
-
-        [ x ] ->
-            [ x ]
-
-        x :: y :: _ ->
-            if 2 * y > 9 then
-                x :: sumInt (2 * y) :: luhnSecondEach (List.drop 2 list)
-            else
-                x :: (2 * y) :: luhnSecondEach (List.drop 2 list)
-
-
-toStringRepresentation : Char -> String
-toStringRepresentation input =
-    fromList [ input ]
-
-
-toDigits : String -> List Int
-toDigits input =
+checkLuhn : String -> Maybe Bool
+checkLuhn input =
     let
         lastDigit =
             input
                 |> String.right 1
                 |> parseInt
 
-        stringDigitsList =
-            List.map toStringRepresentation (toList input)
+        dropLastAndReverse =
+            List.reverse >> List.tail
+
+        multiplyOdds =
+            List.indexedMap
+                (\i item ->
+                    if i % 2 == 0 then
+                        let
+                            result =
+                                (parseInt item) * 2
+                        in
+                            if result > 9 then
+                                result - 9
+                            else
+                                result
+                    else
+                        parseInt item
+                )
+
+        checkSumMod n =
+            10 - (n % 10) == lastDigit
     in
-        if parseInt input < 0 then
-            []
-        else
-            List.map parseInt stringDigitsList
-
-
-toListReverse : String -> List Int
-toListReverse input =
-    List.reverse (toDigits input)
-
-
-sumDigits : List Int -> Int
-sumDigits list =
-    List.foldr (+) 0 list
-
-
-sumInt : Int -> Int
-sumInt input =
-    sumDigits (toDigits <| toString input)
+        input
+            |> String.split ""
+            |> dropLastAndReverse
+            |> Maybe.map multiplyOdds
+            |> Maybe.map List.sum
+            |> Maybe.map checkSumMod
 
 
 
