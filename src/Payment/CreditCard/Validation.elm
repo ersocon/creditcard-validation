@@ -28,72 +28,72 @@ import Regex
 -}
 isValid : String -> Bool
 isValid input =
-    Just input
-        |> Maybe.andThen isNumber
-        |> Maybe.andThen checkLength
-        |> Maybe.andThen checkLuhn
-        |> Maybe.withDefault False
+  Just input
+    |> Maybe.andThen isNumber
+    |> Maybe.andThen checkLength
+    |> Maybe.andThen checkLuhn
+    |> Maybe.withDefault False
 
 
 isNumber : String -> Maybe String
 isNumber input =
-    let
-        regexRule =
-            Regex.regex "^[\\d]+$"
-    in
-        if
-            Regex.find Regex.All regexRule input
-                |> List.isEmpty
-        then
-            Nothing
-        else
-            Just input
+  let
+    regexRule =
+      Regex.regex "^[\\d]+$"
+  in
+    if
+      Regex.find Regex.All regexRule input
+        |> List.isEmpty
+    then
+      Nothing
+    else
+      Just input
 
 
 checkLength : String -> Maybe String
 checkLength input =
-    if input /= "" && String.length input <= 19 then
-        Just input
-    else
-        Nothing
+  if input /= "" && String.length input <= 19 then
+    Just input
+  else
+    Nothing
 
 
 checkLuhn : String -> Maybe Bool
 checkLuhn input =
-    let
-        lastDigit =
-            input
-                |> String.right 1
-                |> parseInt
+  let
+    lastDigit =
+      input
+        |> String.right 1
+        |> parseInt
 
-        dropLastAndReverse =
-            List.reverse >> List.tail
+    dropLastAndReverse =
+      List.reverse >> List.tail
 
-        multiplyOdds =
-            List.indexedMap
-                (\i item ->
-                    if i % 2 == 0 then
-                        let
-                            result =
-                                (parseInt item) * 2
-                        in
-                            if result > 9 then
-                                result - 9
-                            else
-                                result
-                    else
-                        parseInt item
-                )
+    multiplyOdds =
+      List.indexedMap
+        (\i item ->
+          if i % 2 == 0 then
+            let
+              result =
+                (parseInt item) * 2
+            in
+              if result > 9 then
+                result - 9
+              else
+                result
+          else
+            parseInt item
+        )
 
-        checkSumMod n =
-            10 - (n % 10) == lastDigit
-    in
-        input
-            |> String.split ""
-            |> dropLastAndReverse
-            |> Maybe.map multiplyOdds
-            |> Maybe.map List.sum
-            |> Maybe.map checkSumMod
+    checkSumMod n =
+      10 - (n % 10) == lastDigit
+  in
+    input
+      |> String.split ""
+      |> dropLastAndReverse
+      |> Maybe.map multiplyOdds
+      |> Maybe.map List.sum
+      |> Maybe.map checkSumMod
 
 
 
@@ -102,4 +102,4 @@ checkLuhn input =
 
 parseInt : String -> Int
 parseInt input =
-    Result.withDefault 0 (String.toInt input)
+  Result.withDefault 0 (String.toInt input)

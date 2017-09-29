@@ -6,6 +6,6 @@ import Tests
 
 suite : Test
 suite =
-    describe "All tests"
-        [ Tests.all
-        ]
+  describe "All tests"
+    [ Tests.all
+    ]
