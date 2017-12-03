@@ -21,5 +21,8 @@
   "homepage": "https://github.com/ersocon/creditcard-validation#readme",
   "devDependencies": {
     "elm-test": "0.18.9"
+  },
+  "dependencies": {
+    "elm": "^0.18.0"
   }
 }
