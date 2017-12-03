@@ -13,80 +13,93 @@ The main use case is the validation of credit card numbers entered by users in
 an input field. To avoid dependencies to parser libraries there is no
 function with the signature of String -> Bool.
 
+
 # Definition
+
 @docs isValid
 
 -}
 
 import String exposing (toInt, toList, fromList)
-
-{-| Check the given credit card number for validity -}
-isValid : Int -> Bool
-isValid creditCardNumber =
-  if creditCardNumber > 0
-    && (sumDigits <| luhnSecondEach <| toListReverse creditCardNumber ) % 10 == 0 then
-    True
-  else
-    False
+import Regex
 
 
-
-luhnSecondEach : List Int -> List Int
-luhnSecondEach list =
-  case list of
-    [] ->
-      []
-    [x] ->
-      [x]
-    x::y::_ ->
-      if 2*y > 9 then
-        x :: sumInt (2*y) :: luhnSecondEach (List.drop 2 list)
-      else
-        x :: (2*y) :: luhnSecondEach (List.drop 2 list)
+{-| Check the given credit card number for validity
+-}
+isValid : String -> Bool
+isValid input =
+  Just input
+    |> Maybe.andThen isNumber
+    |> Maybe.andThen checkLength
+    |> Maybe.andThen checkLuhn
+    |> Maybe.withDefault False
 
 
-
-toStringRepresentation: Char -> String
-toStringRepresentation input =
-  fromList [input]
-
-
-
-toDigits : Int -> List Int
-toDigits input =
+isNumber : String -> Maybe String
+isNumber input =
   let
-    lastDigit = input % 10
-    toTransform = (input - lastDigit) // 10
-
-    stringDigitsList = List.map toStringRepresentation (toList (toString input))
+    regexRule =
+      Regex.regex "^[\\d]+$"
   in
-    if input < 0 then
-      []
-    else if input < 10 then
-      [input]
+    if
+      Regex.find Regex.All regexRule input
+        |> List.isEmpty
+    then
+      Nothing
     else
-      List.map parseInt stringDigitsList
+      Just input
 
 
-
-toListReverse : Int -> List Int
-toListReverse input =
-  List.reverse (toDigits input)
-
-
-
-sumDigits : List Int -> Int
-sumDigits list =
-  List.foldr (+) 0 list
+checkLength : String -> Maybe String
+checkLength input =
+  if input /= "" && String.length input <= 19 then
+    Just input
+  else
+    Nothing
 
 
+checkLuhn : String -> Maybe Bool
+checkLuhn input =
+  let
+    lastDigit =
+      input
+        |> String.right 1
+        |> parseInt
 
-sumInt : Int -> Int
-sumInt input =
-  sumDigits (toDigits input)
+    dropLastAndReverse =
+      List.reverse >> List.tail
+
+    multiplyOdds =
+      List.indexedMap
+        (\i item ->
+          if i % 2 == 0 then
+            let
+              result =
+                (parseInt item) * 2
+            in
+              if result > 9 then
+                result - 9
+              else
+                result
+          else
+            parseInt item
+        )
+
+    checkSumMod n =
+      10 - (n % 10) == lastDigit
+  in
+    input
+      |> String.split ""
+      |> dropLastAndReverse
+      |> Maybe.map multiplyOdds
+      |> Maybe.map List.sum
+      |> Maybe.map checkSumMod
+
 
 
 -- Simple parseInt helper (since we rely on the Int -> Bool signature for input)
-parseInt: String -> Int
+
+
+parseInt : String -> Int
 parseInt input =
   Result.withDefault 0 (String.toInt input)

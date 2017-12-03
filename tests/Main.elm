@@ -1,13 +1,11 @@
-port module Main exposing (..)
+module Main exposing (..)
 
+import Test exposing (..)
 import Tests
-import Test.Runner.Node exposing (run, TestProgram)
-import Json.Encode exposing (Value)
 
 
-main : TestProgram
-main =
-    run emit Tests.all
-
-
-port emit : ( String, Value ) -> Cmd msg
+suite : Test
+suite =
+  describe "All tests"
+    [ Tests.all
+    ]

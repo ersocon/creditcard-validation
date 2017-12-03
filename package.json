@@ -1,0 +1,25 @@
+{
+  "name": "creditcard-validation",
+  "version": "1.0.0",
+  "description": "CreditCard validation",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "node_modules/elm-test/bin/elm-test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ersocon/creditcard-validation.git"
+  },
+  "author": "ersocon",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ersocon/creditcard-validation/issues"
+  },
+  "homepage": "https://github.com/ersocon/creditcard-validation#readme",
+  "devDependencies": {
+    "elm-test": "0.18.9"
+  }
+}

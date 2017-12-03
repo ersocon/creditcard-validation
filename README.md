@@ -14,3 +14,10 @@ as is.
 The main use case is the validation of credit card numbers entered by users in
 an input field. To avoid dependencies to parser libraries there is no
 function with the signature of String -> Bool.
+
+
+### Run tests
+
+```
+npm install && npm test
+```
